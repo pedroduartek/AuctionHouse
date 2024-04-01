@@ -22,7 +22,11 @@ namespace AuctionHouseTests.Controllers
             CreateInMemoryDbContext();
             _mapper = Substitute.For<IMapper>();
             _fixture = new Fixture();
-            _sut = new AuctionController(_dbContext, _mapper);
+
+            if (_dbContext != null)
+            {
+                _sut = new AuctionController(_dbContext, _mapper);
+            }
         }
 
         [Fact]

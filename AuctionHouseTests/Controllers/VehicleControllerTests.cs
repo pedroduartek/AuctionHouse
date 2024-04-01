@@ -22,7 +22,10 @@ namespace AuctionHouseTests.Controllers
             CreateInMemoryDbContext();
             _mapper = Substitute.For<IMapper>();
             _fixture = new Fixture();
-            _sut = new VehicleController(_dbContext, _mapper);
+            if(_dbContext != null)
+            {
+                _sut = new VehicleController(_dbContext, _mapper);
+            }
         }
 
         
@@ -158,14 +161,14 @@ namespace AuctionHouseTests.Controllers
             return new VehicleEntity()
             {
                 Id = vehicleInputModel.Id,
-                LoadCapacity = (double)vehicleInputModel.LoadCapacity,
-                Manufacturer = vehicleInputModel.Manufacturer,
-                Model = vehicleInputModel.Model,
-                NumberOfDoors = (int)vehicleInputModel.NumberOfDoors,
-                NumberOfSeats = (int)vehicleInputModel.NumberOfSeats,
-                StartingBid = (double)vehicleInputModel.StartingBid,
-                Type = vehicleInputModel.Type,
-                Year = (int)vehicleInputModel.Year,
+                LoadCapacity = vehicleInputModel.LoadCapacity ?? 0,
+                Manufacturer = vehicleInputModel.Manufacturer ?? "",
+                Model = vehicleInputModel.Model ?? "",
+                NumberOfDoors = vehicleInputModel.NumberOfDoors ?? 0,
+                NumberOfSeats = vehicleInputModel.NumberOfSeats ?? 0,
+                StartingBid = vehicleInputModel.StartingBid ?? 0,
+                Type = vehicleInputModel.Type ?? "",
+                Year = vehicleInputModel.Year ?? 0,
                 AuctionInfo = new AuctionInfo()
             };
         }
