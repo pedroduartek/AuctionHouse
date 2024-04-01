@@ -8,12 +8,16 @@ internal class Program
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
 
         // Add services to the container.
 
         builder.Services.AddAutoMapper(typeof(Program));
+
         builder.Services.AddDbContext<IApplicationDbContext, ApplicationDbContext>(options =>
-                options.UseSqlite("Data Source=mydatabase.db"));
+                options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
