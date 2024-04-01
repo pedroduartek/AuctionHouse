@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/AuctionHouse/mydatabase.db
+/AuctionHouse/mydatabase.db-shm
+/AuctionHouse/mydatabase.db-wal
