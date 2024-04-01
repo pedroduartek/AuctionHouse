@@ -46,7 +46,7 @@ namespace AuctionHouse.Controllers
                 return BadRequest(ex.Message);
             }
 
-            return Ok("Vehicle added to inventory.");
+            return Ok($"Vehicle added to inventory with Id: {vehicleInput.Id}.");
         }
 
         [HttpGet("search")]
