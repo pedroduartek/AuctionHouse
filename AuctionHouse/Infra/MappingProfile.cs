@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using AuctionHouse.Models.Entities;
 using AuctionHouse.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AuctionHouse.Infra
 {
+    [ExcludeFromCodeCoverage]
     public class MappingProfile : Profile
     {
         public MappingProfile()
