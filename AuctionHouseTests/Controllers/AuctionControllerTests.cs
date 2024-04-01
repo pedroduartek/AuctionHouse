@@ -171,10 +171,28 @@ namespace AuctionHouseTests.Controllers
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        public void PlaceBid_WithLowAmount_ReturnsBadRequest(int bidChange)
+        {
+            //Arrange
+            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
+            var invalidBidAmount = (vehicleEntity.AuctionInfo.CurrentBid ?? 0) - bidChange;
+            _dbContext.Vehicles.Add(vehicleEntity);
+            _dbContext.SaveChanges();
+
+            //Act
+            var result = _sut.PlaceBid(vehicleEntity.Id, invalidBidAmount, "Pedro");
+
+            //Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
         private void CreateInMemoryDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                                   .UseInMemoryDatabase("ApplicationDbContext")
+                                   .UseInMemoryDatabase("AuctionControllerMockDb")
                                    .Options;
 
             _dbContext = new ApplicationDbContext(options);

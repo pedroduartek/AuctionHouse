@@ -31,6 +31,11 @@ namespace AuctionHouseTests.Business
             // Assert
             Assert.NotNull(vehicle);
             Assert.Equal(vehicle.GetType().Name, vehicleType);
+            Assert.Equal(vehicle.Model, vehicleInputModel.Model);
+            Assert.Equal(vehicle.Manufacturer, vehicleInputModel.Manufacturer);
+            Assert.Equal(vehicle.Year, vehicleInputModel.Year);
+            Assert.Equal(vehicle.StartingBid, vehicleInputModel.StartingBid);
+            Assert.NotNull(vehicle.Auction);
         }
 
         [Theory]
