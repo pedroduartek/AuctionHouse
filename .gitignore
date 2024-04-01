@@ -364,3 +364,6 @@ FodyWeavers.xsd
 /AuctionHouse/mydatabase.db
 /AuctionHouse/mydatabase.db-shm
 /AuctionHouse/mydatabase.db-wal
+/AuctionHouse/AuctionHouseDb.db-shm
+/AuctionHouse/AuctionHouseDb.db-wal
+/AuctionHouse/AuctionHouseDb.db
