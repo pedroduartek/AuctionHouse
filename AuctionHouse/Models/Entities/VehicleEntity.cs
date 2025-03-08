@@ -11,7 +11,7 @@ namespace AuctionHouse.Models.Entities
         public int NumberOfDoors { get; set; }
         public int NumberOfSeats { get; set; }
         public double LoadCapacity { get; set; }
-        public string Type { get; set; }
+        public VehicleType Type { get; set; }
         public AuctionInfo AuctionInfo { get; set; }
     }
 

@@ -22,26 +22,26 @@ namespace AuctionHouseTests.Controllers
             CreateInMemoryDbContext();
             _mapper = Substitute.For<IMapper>();
             _fixture = new Fixture();
-            if(_dbContext != null)
+            if (_dbContext != null)
             {
                 _sut = new VehicleController(_dbContext, _mapper);
             }
         }
 
-        
+
 
         [Theory]
-        [InlineData("Sedan")]
-        [InlineData("Hatchback")]
-        [InlineData("SUV")]
-        [InlineData("Truck")]
-        public void AddVehicle_WithValidVehicleInputModel_AddsVehicle(string vehicleType)
+        [InlineData(VehicleType.Sedan)]
+        [InlineData(VehicleType.Hatchback)]
+        [InlineData(VehicleType.SUV)]
+        [InlineData(VehicleType.Truck)]
+        public void AddVehicle_WithValidVehicleInputModel_AddsVehicle(VehicleType vehicleType)
         {
             //Arrange
             var vehicleInputModel = _fixture.Build<VehicleInputModel>()
                                             .With(v => v.Type, vehicleType)
                                             .Create();
-            
+
             var vehicleEntity = CreateObjectForMapper(vehicleInputModel);
             _mapper.Map<VehicleEntity>(vehicleInputModel).ReturnsForAnyArgs(vehicleEntity);
 
@@ -53,36 +53,14 @@ namespace AuctionHouseTests.Controllers
             Assert.NotNull(vehicleAdded);
         }
 
-        
 
-        [Theory]
-        [InlineData("Sport")]
-        [InlineData("City")]
-        public void AddVehicle_WithInvalidVehicletype_ReturnsBadRequest(string vehicleType)
-        {
-            //Arrange
-            var vehicleInputModel = _fixture.Build<VehicleInputModel>()
-                                            .With(v => v.Type, vehicleType)
-                                            .Create();
-
-            var vehicleEntity = CreateObjectForMapper(vehicleInputModel);
-            _mapper.Map<VehicleEntity>(vehicleInputModel).ReturnsForAnyArgs(vehicleEntity);
-
-            //Act
-            var result = _sut.AddVehicle(vehicleInputModel);
-            var vehicleAdded = _dbContext.Vehicles.FirstOrDefault(v => v.Id == vehicleInputModel.Id);
-
-            //Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-            Assert.Null(vehicleAdded);
-        }
 
         [Fact]
         public void AddVehicle_WithExistingId_ReturnsBadRequest()
         {
             //Arrange
             var vehicleInputModel = _fixture.Build<VehicleInputModel>()
-                                            .With(v => v.Type, "Sedan")
+                                            .With(v => v.Type, VehicleType.Sedan)
                                             .Create();
 
             var vehicleEntity = CreateObjectForMapper(vehicleInputModel);
@@ -100,12 +78,12 @@ namespace AuctionHouseTests.Controllers
 
         [Theory]
         [InlineData(null, null, null)]
-        [InlineData("", "", "")]
-        public void SearchVehicles_WithNullOrEmptyParams_ReturnsAllVehicles(string? type, string? manufacturer,string? model)
+        [InlineData(null, "", "")]
+        public void SearchVehicles_WithNullOrEmptyParams_ReturnsAllVehicles(VehicleType? type, string? manufacturer, string? model)
         {
             //Arrange
             var vehicleInputModel = _fixture.Build<VehicleInputModel>()
-                                            .With(v => v.Type, "Sedan")
+                                            .With(v => v.Type, VehicleType.Sedan)
                                             .Create();
 
             var vehicleEntity = CreateObjectForMapper(vehicleInputModel);
@@ -133,7 +111,7 @@ namespace AuctionHouseTests.Controllers
         {
             //Arrange
             var vehicleInputModel = _fixture.Build<VehicleInputModel>()
-                                            .With(v => v.Type, "Sedan")
+                                            .With(v => v.Type, VehicleType.Sedan)
                                             .Create();
 
             var vehicleEntity = CreateObjectForMapper(vehicleInputModel);
@@ -167,7 +145,7 @@ namespace AuctionHouseTests.Controllers
                 NumberOfDoors = vehicleInputModel.NumberOfDoors ?? 0,
                 NumberOfSeats = vehicleInputModel.NumberOfSeats ?? 0,
                 StartingBid = vehicleInputModel.StartingBid ?? 0,
-                Type = vehicleInputModel.Type ?? "",
+                Type = vehicleInputModel.Type,
                 Year = vehicleInputModel.Year ?? 0,
                 AuctionInfo = new AuctionInfo()
             };

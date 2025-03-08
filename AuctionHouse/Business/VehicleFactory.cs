@@ -2,16 +2,11 @@
 
 namespace AuctionHouse.Business
 {
-    public class VehicleFactory
+    public static class VehicleFactory
     {
         public static Vehicle CreateVehicle(VehicleInputModel vehicleInput)
         {
-            if (!Enum.TryParse(vehicleInput.Type, out VehicleType vehicleType))
-            {
-                throw new ArgumentException("Invalid vehicle type.");
-            }
-
-            switch (vehicleType)
+            switch (vehicleInput.Type)
             {
                 case VehicleType.Sedan:
                     return new Sedan(vehicleInput.NumberOfDoors, vehicleInput.Manufacturer, vehicleInput.Model, vehicleInput.Year, vehicleInput.StartingBid);

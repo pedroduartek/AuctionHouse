@@ -92,5 +92,15 @@ namespace AuctionHouse.Controllers
 
             return Ok($"Bid placed successfully for vehicle with ID: {vehicleId}.");
         }
+
+        [HttpGet("active-auctions")]
+        public IActionResult GetActiveAuctions()
+        {
+            var activeAuctions = _dbContext.Vehicles
+                                        .Include(v => v.AuctionInfo)
+                                        .Where(v => v.AuctionInfo.IsAuctionActive)
+                                        .ToList();
+            return Ok(activeAuctions);
+        }
     }
 }

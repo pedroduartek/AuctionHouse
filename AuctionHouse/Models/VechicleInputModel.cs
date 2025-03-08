@@ -3,7 +3,7 @@
     public class VehicleInputModel
     {
         public Guid Id { get; set; }
-        public string? Type { get; set; }
+        public VehicleType Type { get; set; }
         public int? NumberOfDoors { get; set; }
         public int? NumberOfSeats { get; set; }
         public double? LoadCapacity { get; set; }

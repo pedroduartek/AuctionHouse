@@ -36,8 +36,8 @@ namespace AuctionHouse.Controllers
                 var vehicleToAdd = VehicleFactory.CreateVehicle(vehicleInput);
                 var newVehicleEntity = _mapper.Map<VehicleEntity>(vehicleToAdd);
 
-                newVehicleEntity.Id = vehicleInput.Id; 
-                
+                newVehicleEntity.Id = vehicleInput.Id;
+
                 _dbContext.Vehicles.Add(newVehicleEntity);
                 _dbContext.SaveChanges();
             }
@@ -50,13 +50,13 @@ namespace AuctionHouse.Controllers
         }
 
         [HttpGet("search")]
-        public IActionResult SearchVehicles(string? type, string? manufacturer, string? model, int? year)
+        public IActionResult SearchVehicles(VehicleType? type, string? manufacturer, string? model, int? year)
         {
             var query = _dbContext.Vehicles.AsQueryable();
 
-            if (!string.IsNullOrEmpty(type))
+            if (type != null)
             {
-                query = query.Where(v => v.Type.ToLower() == type.ToLower());
+                query = query.Where(v => v.Type == type);
             }
             if (!string.IsNullOrEmpty(manufacturer))
             {
