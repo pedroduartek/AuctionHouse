@@ -12,7 +12,7 @@ namespace AuctionHouse.Models.Entities
         public int NumberOfSeats { get; set; }
         public double LoadCapacity { get; set; }
         public VehicleType Type { get; set; }
-        public AuctionInfo AuctionInfo { get; set; }
+        public DateTime? SoldDate { get; set; }
     }
 
 }

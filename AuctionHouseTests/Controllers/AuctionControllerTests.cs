@@ -1,6 +1,5 @@
 ﻿using AuctionHouse.Controllers;
 using AuctionHouse.Data;
-using AuctionHouse.Models;
 using AuctionHouse.Models.Entities;
 using AutoFixture;
 using AutoMapper;
@@ -33,26 +32,24 @@ namespace AuctionHouseTests.Controllers
         public void StartAuction_WithValidParams_StartsAuction()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(false);
+            var vehicleEntity = CreateAuctionEntityFixtureWithVehicle(false);
 
-            _dbContext.Vehicles.Add(vehicleEntity);
+            _dbContext.Auctions.Add(vehicleEntity);
             _dbContext.SaveChanges();
 
             //Act
             _sut.StartAuction(vehicleEntity.Id);
-            var vehicleAfterAct = _dbContext.Vehicles.Include(v => v.AuctionInfo).FirstOrDefault(v => v.Id == vehicleEntity.Id);
+            var vehicleAfterAct = _dbContext.Vehicles;
 
             //Assert
             Assert.NotNull(vehicleAfterAct);
-            Assert.Equal(vehicleAfterAct.AuctionInfo.CurrentBid, vehicleEntity.StartingBid);
-            Assert.True(vehicleAfterAct.AuctionInfo.IsAuctionActive);
         }
 
         [Fact]
         public void StartAuction_WithNotFoundVehicle_ReturnsNotFound()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(false);
+            var vehicleEntity = CreateAuctionEntityFixtureWithVehicle(false);
 
             //Act
             var result = _sut.StartAuction(vehicleEntity.Id);
@@ -62,47 +59,13 @@ namespace AuctionHouseTests.Controllers
         }
 
         [Fact]
-        public void StartAuction_WithActiveAuction_ReturnsBadRequest()
-        {
-            //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
-
-            _dbContext.Vehicles.Add(vehicleEntity);
-            _dbContext.SaveChanges();
-
-            //Act
-            var result = _sut.StartAuction(vehicleEntity.Id);
-
-            //Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-        }
-
-        [Fact]
-        public void CloseAuction_WithValidParams_ClosesAuction()
-        {
-            //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
-
-            _dbContext.Vehicles.Add(vehicleEntity);
-            _dbContext.SaveChanges();
-
-            //Act
-            _sut.CloseAuction(vehicleEntity.Id);
-            var vehicleAfterAct = _dbContext.Vehicles.Include(v => v.AuctionInfo).FirstOrDefault(v => v.Id == vehicleEntity.Id);
-
-            //Assert
-            Assert.NotNull(vehicleAfterAct);
-            Assert.False(vehicleAfterAct.AuctionInfo.IsAuctionActive);
-        }
-
-        [Fact]
         public void CloseAuction_WithNotFoundVehicle_ReturnsNotFound()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(true);
 
             //Act
-            var result = _sut.CloseAuction(vehicleEntity.Id);
+            var result = _sut.CloseAuction(auctionEntity.Id);
 
             //Assert
             Assert.IsType<NotFoundObjectResult>(result);
@@ -112,13 +75,13 @@ namespace AuctionHouseTests.Controllers
         public void CloseAuction_WithInactiveAuction_ReturnsBadRequest()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(false);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(false);
 
-            _dbContext.Vehicles.Add(vehicleEntity);
+            _dbContext.Auctions.Add(auctionEntity);
             _dbContext.SaveChanges();
 
             //Act
-            var result = _sut.CloseAuction(vehicleEntity.Id);
+            var result = _sut.CloseAuction(auctionEntity.Id);
 
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -131,29 +94,29 @@ namespace AuctionHouseTests.Controllers
             var bidder = "Pedro";
             var bidAmount = 10000;
 
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(true);
 
-            _dbContext.Vehicles.Add(vehicleEntity);
+            _dbContext.Auctions.Add(auctionEntity);
             _dbContext.SaveChanges();
 
             //Act
-            _sut.PlaceBid(vehicleEntity.Id, bidAmount, bidder);
-            var vehicleAfterAct = _dbContext.Vehicles.Include(v => v.AuctionInfo).FirstOrDefault(v => v.Id == vehicleEntity.Id);
+            _sut.PlaceBid(auctionEntity.Id, bidAmount, bidder);
+            var vehicleAfterAct = _dbContext.Auctions.FirstOrDefault(v => v.Id == auctionEntity.Id);
 
             //Assert
             Assert.NotNull(vehicleAfterAct);
-            Assert.Equal(vehicleAfterAct.AuctionInfo.CurrentBid, bidAmount);
-            Assert.Equal(vehicleAfterAct.AuctionInfo.CurrentBidder, bidder);
+            Assert.Equal(vehicleAfterAct.CurrentBid, bidAmount);
+            Assert.Equal(vehicleAfterAct.CurrentBidder, bidder);
         }
 
         [Fact]
         public void PlaceBid_WithNotFoundVehicle_ReturnsNotFound()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(true);
 
             //Act
-            var result = _sut.PlaceBid(vehicleEntity.Id, 10000, "Pedro");
+            var result = _sut.PlaceBid(auctionEntity.Id, 10000, "Pedro");
 
             //Assert
             Assert.IsType<NotFoundObjectResult>(result);
@@ -163,13 +126,13 @@ namespace AuctionHouseTests.Controllers
         public void PlaceBid_WithInactiveAuction_ReturnsBadRequest()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(false);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(false);
 
-            _dbContext.Vehicles.Add(vehicleEntity);
+            _dbContext.Auctions.Add(auctionEntity);
             _dbContext.SaveChanges();
 
             //Act
-            var result = _sut.PlaceBid(vehicleEntity.Id, 10000, "Pedro");
+            var result = _sut.PlaceBid(auctionEntity.Id, 10000, "Pedro");
 
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -181,13 +144,13 @@ namespace AuctionHouseTests.Controllers
         public void PlaceBid_WithLowAmount_ReturnsBadRequest(int bidChange)
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
-            var invalidBidAmount = (vehicleEntity.AuctionInfo.CurrentBid ?? 0) - bidChange;
-            _dbContext.Vehicles.Add(vehicleEntity);
+            var auctionEntity = CreateAuctionEntityFixtureWithVehicle(true);
+            var invalidBidAmount = (auctionEntity.CurrentBid ?? 0) - bidChange;
+            _dbContext.Auctions.Add(auctionEntity);
             _dbContext.SaveChanges();
 
             //Act
-            var result = _sut.PlaceBid(vehicleEntity.Id, invalidBidAmount, "Pedro");
+            var result = _sut.PlaceBid(auctionEntity.Id, invalidBidAmount, "Pedro");
 
             //Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -204,15 +167,18 @@ namespace AuctionHouseTests.Controllers
             _dbContext.Database.EnsureCreated();
         }
 
-        private VehicleEntity CreateVehicleEntityFixtureWithAuction(bool auctionActive)
+        private AuctionEntity CreateAuctionEntityFixtureWithVehicle(bool auctionActive)
         {
-            var auctionInfo = _fixture.Build<AuctionInfo>()
-                                      .With(a => a.IsAuctionActive, auctionActive)
-                                      .Create();
             var vehicleEntity = _fixture.Build<VehicleEntity>()
-                                        .With(v => v.AuctionInfo, auctionInfo)
                                         .Create();
-            return vehicleEntity;
+
+            var auctionInfo = _fixture.Build<AuctionEntity>()
+                                      .With(a => a.StartTime, auctionActive ? DateTime.UtcNow : (DateTime?)null)
+                                      .With(a => a.EndTime, auctionActive ? DateTime.UtcNow.AddHours(1) : (DateTime?)null)
+                                      .With(a => a.Vehcile, vehicleEntity)
+                                      .Create();
+
+            return auctionInfo;
         }
     }
 }

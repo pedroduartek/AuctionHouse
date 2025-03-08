@@ -1,4 +1,6 @@
-﻿namespace AuctionHouse.Models
+﻿using AuctionHouse.Models.Entities;
+
+namespace AuctionHouse.Models
 {
     public abstract class Vehicle
     {
@@ -6,25 +8,24 @@
         public string? Model { get; }
         public int? Year { get; }
         public double? StartingBid { get; }
-        public AuctionInfo Auction { get; }
+        public AuctionEntity Auction { get; }
 
         public Vehicle(string? manufacturer, string? model, int? year, double? startingBid)
         {
-            if(manufacturer is null) throw new ArgumentNullException(nameof(Manufacturer));
-            if(model is null) throw new ArgumentNullException(nameof(Model));
-            if(year is null) throw new ArgumentNullException(nameof(Year));
-            if(startingBid is null) throw new ArgumentNullException(nameof(StartingBid));
+            if (manufacturer is null) throw new ArgumentNullException(nameof(Manufacturer));
+            if (model is null) throw new ArgumentNullException(nameof(Model));
+            if (year is null) throw new ArgumentNullException(nameof(Year));
+            if (startingBid is null) throw new ArgumentNullException(nameof(StartingBid));
 
             Manufacturer = manufacturer;
             Model = model;
             Year = year;
             StartingBid = startingBid;
-            Auction = new AuctionInfo()
+            Auction = new AuctionEntity()
             {
-                IsAuctionActive = false,
                 Id = Guid.NewGuid()
             };
         }
-        
+
     }
 }

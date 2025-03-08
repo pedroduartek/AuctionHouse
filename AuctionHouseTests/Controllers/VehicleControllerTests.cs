@@ -95,7 +95,7 @@ namespace AuctionHouseTests.Controllers
             var listOfVehicles = new List<VehicleEntity>();
 
             //Act
-            var result = _sut.SearchVehicles(type, manufacturer, model, null);
+            var result = _sut.SearchVehicles(type, manufacturer, model, null, null, null);
             if (result is OkObjectResult)
             {
                 var okObjectResult = result as OkObjectResult;
@@ -123,7 +123,7 @@ namespace AuctionHouseTests.Controllers
             var listOfVehicles = new List<VehicleEntity>();
 
             //Act
-            var result = _sut.SearchVehicles(vehicleEntity.Type, vehicleEntity.Manufacturer, vehicleEntity.Model, vehicleEntity.Year);
+            var result = _sut.SearchVehicles(vehicleEntity.Type, vehicleEntity.Manufacturer, vehicleEntity.Model, vehicleEntity.Year, null, null);
             if (result is OkObjectResult)
             {
                 var okObjectResult = result as OkObjectResult;
@@ -147,7 +147,6 @@ namespace AuctionHouseTests.Controllers
                 StartingBid = vehicleInputModel.StartingBid ?? 0,
                 Type = vehicleInputModel.Type,
                 Year = vehicleInputModel.Year ?? 0,
-                AuctionInfo = new AuctionInfo()
             };
         }
 

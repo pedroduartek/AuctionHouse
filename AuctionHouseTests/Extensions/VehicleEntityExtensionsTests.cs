@@ -1,5 +1,4 @@
-﻿using AuctionHouse.Models;
-using AuctionHouse.Models.Entities;
+﻿using AuctionHouse.Models.Entities;
 using AutoFixture;
 
 namespace AuctionHouseTests.Extensions
@@ -17,14 +16,14 @@ namespace AuctionHouseTests.Extensions
         public void StartAuction_WithInactiveAuction_StartsAuction()
         {
             //Arrange
-            var vehicleEntity = CreateVehicleEntityFixtureWithAuction(false);
+            var auctionEntity = CreateVehicleEntityFixtureWithAuction(false);
 
             //Act
-            vehicleEntity.StartAuction();
+            auctionEntity.StartAuction();
 
             //Assert
-            Assert.True(vehicleEntity.AuctionInfo.IsAuctionActive);
-            Assert.Equal(vehicleEntity.AuctionInfo.CurrentBid, vehicleEntity.StartingBid);
+            Assert.True(auctionEntity.IsAuctionActive());
+            Assert.Equal(auctionEntity.CurrentBid, auctionEntity.Vehcile.StartingBid);
         }
 
         [Fact]
@@ -52,7 +51,7 @@ namespace AuctionHouseTests.Extensions
             vehicleEntity.CloseAuction();
 
             //Assert
-            Assert.True(vehicleEntity.AuctionInfo.IsAuctionActive == false);
+            Assert.True(vehicleEntity.IsAuctionActive() == false);
         }
 
         [Fact]
@@ -92,15 +91,15 @@ namespace AuctionHouseTests.Extensions
         {
             //Arrange
             var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
-            var bidAmount = (vehicleEntity.AuctionInfo.CurrentBid ?? 0) + 1;
+            var bidAmount = (vehicleEntity.CurrentBid ?? 0) + 1;
             var bidder = _fixture.Create<string>();
 
             //Act
             vehicleEntity.PlaceBid(bidAmount, bidder);
 
             //Assert
-            Assert.Equal(vehicleEntity.AuctionInfo.CurrentBid, bidAmount);
-            Assert.Equal(vehicleEntity.AuctionInfo.CurrentBidder, bidder);
+            Assert.Equal(vehicleEntity.CurrentBid, bidAmount);
+            Assert.Equal(vehicleEntity.CurrentBidder, bidder);
         }
 
         [Fact]
@@ -108,7 +107,7 @@ namespace AuctionHouseTests.Extensions
         {
             //Arrange
             var vehicleEntity = CreateVehicleEntityFixtureWithAuction(true);
-            var bidAmount = (vehicleEntity.AuctionInfo.CurrentBid ?? 0) - 1;
+            var bidAmount = (vehicleEntity.CurrentBid ?? 0) - 1;
             var bidder = _fixture.Create<string>();
 
             var vehicleEntityBeforeAct = vehicleEntity;
@@ -117,18 +116,21 @@ namespace AuctionHouseTests.Extensions
             vehicleEntity.PlaceBid(bidAmount, bidder);
 
             //Assert
-            Assert.Equal(vehicleEntity,vehicleEntityBeforeAct);
+            Assert.Equal(vehicleEntity, vehicleEntityBeforeAct);
         }
 
-        private VehicleEntity CreateVehicleEntityFixtureWithAuction(bool auctionActive)
+        private AuctionEntity CreateVehicleEntityFixtureWithAuction(bool auctionActive)
         {
-            var auctionInfo = _fixture.Build<AuctionInfo>()
-                                      .With(a => a.IsAuctionActive, auctionActive)
-                                      .Create();
             var vehicleEntity = _fixture.Build<VehicleEntity>()
-                                        .With(v => v.AuctionInfo, auctionInfo)
                                         .Create();
-            return vehicleEntity;
+
+            var auctionInfo = _fixture.Build<AuctionEntity>()
+                                      .With(a => a.StartTime, auctionActive ? DateTime.Now : (DateTime?)null)
+                                      .With(a => a.EndTime, auctionActive ? DateTime.Now.AddHours(1) : (DateTime?)null)
+                                      .With(a => a.Vehcile, vehicleEntity)
+                                      .Create();
+
+            return auctionInfo;
         }
     }
 }

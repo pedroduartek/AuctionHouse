@@ -19,88 +19,100 @@ namespace AuctionHouse.Controllers
         }
 
         [HttpPost("start")]
-        public IActionResult StartAuction(Guid vehicleId)
+        public IActionResult StartAuction(Guid auctionId)
         {
-            var vehicle = _dbContext.Vehicles
-                                    .Include(v => v.AuctionInfo)
-                                    .FirstOrDefault(v => v.Id == vehicleId);
+            var auction = _dbContext.Auctions
+                                    .Include(v => v.Vehcile)
+                                    .FirstOrDefault(v => v.Id == auctionId);
 
-            if (vehicle == null)
+            if (auction == null)
             {
                 return NotFound("Vehicle not found.");
             }
 
-            if (vehicle.AuctionInfo.IsAuctionActive)
+            if (auction.IsAuctionActive())
             {
                 return BadRequest("Auction is already active for this vehicle.");
             }
 
-            vehicle.StartAuction();
+            auction.StartAuction();
 
             _dbContext.SaveChanges();
 
-            return Ok($"Auction started for vehicle with ID: {vehicleId}.");
+            return Ok($"Auction started for vehicle with ID: {auctionId}.");
         }
 
         [HttpPost("close")]
-        public IActionResult CloseAuction(Guid vehicleId)
+        public IActionResult CloseAuction(Guid auctionId)
         {
-            var vehicle = _dbContext.Vehicles
-                                    .Include(v => v.AuctionInfo)
-                                    .FirstOrDefault(v => v.Id == vehicleId);
+            var auction = _dbContext.Auctions
+                                    .Include(v => v.Vehcile)
+                                    .FirstOrDefault(v => v.Id == auctionId);
 
-            if (vehicle == null)
+            if (auction == null)
             {
                 return NotFound("Vehicle not found.");
             }
 
-            if (!vehicle.AuctionInfo.IsAuctionActive)
+            if (!auction.IsAuctionActive())
             {
                 return BadRequest("Auction is not active for this vehicle.");
             }
 
-            vehicle.CloseAuction();
-
+            auction.CloseAuction();
+            auction.Vehcile.SoldDate = DateTime.Now;
             _dbContext.SaveChanges();
 
-            return Ok($"Auction closed for vehicle with ID: {vehicleId}.");
+            return Ok($"Auction closed for vehicle with ID: {auctionId}.");
         }
 
         [HttpPost("place-bid")]
-        public IActionResult PlaceBid(Guid vehicleId, double bidAmount, string bidder)
+        public IActionResult PlaceBid(Guid auctionId, double bidAmount, string bidder)
         {
-            var vehicle = _dbContext.Vehicles.Include(v => v.AuctionInfo).FirstOrDefault(v => v.Id == vehicleId);
+            var auction = _dbContext.Auctions.Include(v => v.Vehcile).FirstOrDefault(v => v.Id == auctionId);
 
-            if (vehicle == null)
+            if (auction == null)
             {
                 return NotFound("Vehicle not found.");
             }
 
-            if (!vehicle.AuctionInfo.IsAuctionActive)
+            if (!auction.IsAuctionActive())
             {
                 return BadRequest("Auction is not active for this vehicle.");
             }
 
-            if (bidAmount <= vehicle.AuctionInfo.CurrentBid)
+            if (bidAmount <= auction.CurrentBid)
             {
                 return BadRequest("Bid amount must be higher than the current bid.");
             }
 
-            vehicle.PlaceBid(bidAmount, bidder);
+            auction.PlaceBid(bidAmount, bidder);
 
             _dbContext.SaveChanges();
 
-            return Ok($"Bid placed successfully for vehicle with ID: {vehicleId}.");
+            return Ok($"Bid placed successfully for vehicle with ID: {auctionId}.");
         }
 
-        [HttpGet("active-auctions")]
-        public IActionResult GetActiveAuctions()
+        [HttpGet("auctions")]
+        public IActionResult GetAuctions(bool? active, Guid? vehicleId)
         {
-            var activeAuctions = _dbContext.Vehicles
-                                        .Include(v => v.AuctionInfo)
-                                        .Where(v => v.AuctionInfo.IsAuctionActive)
-                                        .ToList();
-            return Ok(activeAuctions);
+            var query = _dbContext.Auctions
+                                        .Include(v => v.Vehcile)
+                                        .AsQueryable();
+
+            if (active.HasValue)
+            {
+                query = query.FilterByActiveStatus(active);
+            }
+            if (vehicleId.HasValue)
+            {
+                query = query.Where(a => a.Vehcile.Id == vehicleId);
+            }
+
+
+            var auctionResults = query.ToList();
+
+            return Ok(auctionResults);
         }
     }
 }

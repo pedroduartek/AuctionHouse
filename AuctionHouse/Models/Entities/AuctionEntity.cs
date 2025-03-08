@@ -1,13 +1,14 @@
-﻿namespace AuctionHouse.Models
+﻿
+namespace AuctionHouse.Models.Entities
 {
-    public class AuctionInfo
+    public class AuctionEntity
     {
         public Guid Id { get; set; }
-        public bool IsAuctionActive { get; set; }
         public double? CurrentBid { get; set; }
         public string? CurrentBidder { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
-        public Vehicle Vehcile { get; set; }
+        public VehicleEntity Vehcile { get; set; }
     }
+
 }

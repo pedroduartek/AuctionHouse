@@ -10,11 +10,13 @@ namespace AuctionHouse.Data
         }
 
         public DbSet<VehicleEntity> Vehicles { get; set; }
+        public DbSet<AuctionEntity> Auctions { get; set; }
     }
 
     public interface IApplicationDbContext
     {
         DbSet<VehicleEntity> Vehicles { get; set; }
+        DbSet<AuctionEntity> Auctions { get; set; }
 
         int SaveChanges();
     }

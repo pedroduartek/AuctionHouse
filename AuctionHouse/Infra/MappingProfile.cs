@@ -11,7 +11,6 @@ namespace AuctionHouse.Infra
         public MappingProfile()
         {
             CreateMap<Vehicle, VehicleEntity>()
-                .ForMember(dest => dest.AuctionInfo, opt => opt.MapFrom(src => src.Auction))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetType().Name));
         }
     }

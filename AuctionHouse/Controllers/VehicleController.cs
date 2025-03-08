@@ -4,7 +4,6 @@ using AuctionHouse.Models;
 using AuctionHouse.Models.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AuctionHouse.Controllers
 {
@@ -37,8 +36,10 @@ namespace AuctionHouse.Controllers
                 var newVehicleEntity = _mapper.Map<VehicleEntity>(vehicleToAdd);
 
                 newVehicleEntity.Id = vehicleInput.Id;
+                var newAuction = new AuctionEntity() { Id = Guid.NewGuid(), CurrentBid = vehicleInput.StartingBid, Vehcile = newVehicleEntity };
 
                 _dbContext.Vehicles.Add(newVehicleEntity);
+                _dbContext.Auctions.Add(newAuction);
                 _dbContext.SaveChanges();
             }
             catch (ArgumentException ex)
@@ -50,7 +51,7 @@ namespace AuctionHouse.Controllers
         }
 
         [HttpGet("search")]
-        public IActionResult SearchVehicles(VehicleType? type, string? manufacturer, string? model, int? year)
+        public IActionResult SearchVehicles(VehicleType? type, string? manufacturer, string? model, int? year, bool? sold, DateTime? soldAfterDateTime)
         {
             var query = _dbContext.Vehicles.AsQueryable();
 
@@ -70,8 +71,26 @@ namespace AuctionHouse.Controllers
             {
                 query = query.Where(v => v.Year == year);
             }
+            if (sold.HasValue)
+            {
+                if (sold == true)
+                {
+                    if (soldAfterDateTime.HasValue)
+                    {
+                        query = query.Where(v => v.SoldDate > soldAfterDateTime);
+                    }
+                    else
+                    {
+                        query = query.Where(v => v.SoldDate != null);
+                    }
+                }
+                else
+                {
+                    query = query.Where(v => v.SoldDate == null);
+                }
+            }
 
-            var searchResults = query.Include(v => v.AuctionInfo).ToList();
+            var searchResults = query.ToList();
 
             return Ok(searchResults);
         }
